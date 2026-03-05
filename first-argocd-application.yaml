@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: first-argocd-declartive-app
+  namespace: argocd # this is the namespace where Argo CD is installed. By default,
+                  # Argo CD is installed in the argocd namespace, so we specify that here to ensure that the application is created in the same namespace as Argo CD.
+spec:
+  project: default
+  source:
+    repoURL:  https://github.com/seang454/helm-argocd
+    targetRevision: HEAD # we can specify a branch, tag, or commit hash to deploy a specific version of the application. In this case, we are using HEAD to deploy the latest version of the main branch.
+    # HEAD is a special reference that points to the latest commit on the default branch of the repository. By using HEAD, we ensure that Argo CD always deploys the most recent version of the application whenever it synchronizes with the Git repository.
+    path: reatjs-plants-chart # this is the path within the Git repository where the Kubernetes manifests or Helm charts for the application are located. Argo CD will look for the deployment files in this directory when synchronizing the application state.
+  destination:
+    server: https://kubernetes.default.svc # this is the default Kubernetes API server URL that Argo CD uses to deploy applications to the same cluster where Argo CD is running
+    namespace: default
+  syncPolicy: # we use syncPolicy to specify how Argo CD should synchronize the application state between the Git repository and the Kubernetes cluster
+    syncOptions:
+    - validate=false # Disable validation to allow deployment of resources that may not be recognized by the Kubernetes API server, such as custom resources or resources with missing fields. Use with caution, as it may lead to deployment of invalid or incomplete resources.
